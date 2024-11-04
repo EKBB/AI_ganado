@@ -3,11 +3,14 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
 import PredictiveModel from './Behavior';
+import LivestockRouting from './components/LivestockRouting';
+import { ReportForm } from './api-prueba';
 
 const router = createBrowserRouter([
   {
@@ -17,6 +20,14 @@ const router = createBrowserRouter([
   {
     path: "/p",
     element: <PredictiveModel></PredictiveModel>
+  },
+  {
+    path: "/pp",
+    element: <LivestockRouting/>
+  },
+  {
+    path: "/api",
+    element: <ReportForm></ReportForm>
   },
 ]);
 

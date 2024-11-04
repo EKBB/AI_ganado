@@ -1,63 +1,71 @@
-// Archivo: PredictiveModel.js
-import React, { useState } from 'react';
+/* import React, { useEffect } from 'react';
 import * as tf from '@tensorflow/tfjs';
+import * as Papa from 'papaparse';
 
-function PredictiveModel() {
-   const [prediction, setPrediction] = useState(null);
+const GanadoPredictivo = () => {
+    // Función para cargar y preprocesar los datos
+    const loadData = async (filePath) => {
+        const response = await fetch(filePath);
+        const data = await response.text();
 
-   // Definir y entrenar el modelo
-   const trainModel = async () => {
-      // Crear el modelo secuencial
-      const model = tf.sequential();
-      model.add(tf.layers.dense({ units: 10, inputShape: [2], activation: 'relu' }));
-      model.add(tf.layers.dense({ units: 1, activation: 'sigmoid' }));
+        const parsedData = Papa.parse(data, { header: true }).data;
 
-      // Compilar el modelo
-      model.compile({
-         optimizer: 'adam',
-         loss: 'binaryCrossentropy',
-         metrics: ['accuracy'],
-      });
+        // Convertir los datos a formato numérico
+        const inputs = [];
+        const labels = [];
 
-      // Datos de entrenamiento y etiquetas (0 = normal, 1 = desvío)
-      const trainingData = tf.tensor2d([
-         [0.1, 0.5],
-         [0.3, 0.8],
-         [0.4, 0.4],
-         [0.7, 0.2],
-      ]);
-      const labels = tf.tensor2d([[1], [1], [0], [0]]);
+        parsedData.forEach(row => {
+            const lat = parseFloat(row.Latitud);
+            const long = parseFloat(row.Longitud);
+            const velocidad = parseFloat(row.Velocidad);
+            const comportamiento = row.Comportamiento === 'Normal' ? 0 : 1; // Codificación: Normal=0, Desviado=1
 
-      // Entrenar el modelo
-      await model.fit(trainingData, labels, {
-         epochs: 50, // Más epochs puede mejorar el rendimiento
-         verbose: 1,
-      });
+            inputs.push([lat, long, velocidad]);
+            labels.push([comportamiento]);
+        });
 
-      // Guardar el modelo entrenado en el estado
-      return model;
-   };
+        return {
+            inputs: tf.tensor2d(inputs),
+            labels: tf.tensor2d(labels),
+        };
+    };
 
-   // Predicción con datos nuevos
-   const makePrediction = async () => {
-      const model = await trainModel();
+    // Función para crear y entrenar el modelo
+    const createAndTrainModel = async () => {
+        const { inputs, labels } = await loadData('/comportamiento_ganado_simulado.csv'); // Ajusta la ruta según la ubicación del archivo
+        const model = await createModel();
+        await trainModel(model, inputs, labels);
+    };
 
-      // Ejemplo de nuevos datos para predecir
-      const testData = tf.tensor2d([[0.2, 0.6]]);
-      const prediction = model.predict(testData);
+    const createModel = async () => {
+        const model = tf.sequential();
+        model.add(tf.layers.dense({ units: 10, activation: 'relu', inputShape: [3] })); // 3 entradas: latitud, longitud, velocidad
+        model.add(tf.layers.dense({ units: 1, activation: 'sigmoid' })); // Salida binaria
 
-      // Obtener el valor de la predicción
-      const predictionValue = prediction.dataSync()[0];
-      setPrediction(predictionValue > 0.5 ? "Posible Desvío" : "Normal");
-   };
+        model.compile({ optimizer: 'adam', loss: 'binaryCrossentropy', metrics: ['accuracy'] });
 
-   return (
-      <div>
-         <h1>Modelo Predictivo de Ganado</h1>
-         <button onClick={makePrediction}>Predecir Desvío</button>
-         {prediction && <p>Predicción: {prediction}</p>}
-      </div>
-   );
-}
+        return model;
+    };
 
-export default PredictiveModel;
+    const trainModel = async (model, inputs, labels) => {
+        await model.fit(inputs, labels, {
+            epochs: 100,
+            batchSize: 32,
+            validationSplit: 0.2, // 20% para validación
+            callbacks: {
+                onEpochEnd: (epoch, logs) => {
+                    console.log(`Epoch: ${epoch}, Loss: ${logs.loss}, Accuracy: ${logs.acc}`);
+                },
+            },
+        });
+    };
+
+    useEffect(() => {
+        createAndTrainModel();
+    }, []);
+
+    return <div>Entrenando el modelo...</div>;
+};
+
+export default GanadoPredictivo;
+ */
